@@ -29,6 +29,17 @@ async function run() {
         const db = client.db("pet-adoption")
         const petCollection = db.collection("all-pets")
 
+        //GEt/Post/View details Api
+
+        app.get('/pets/:id', async (req, res) => {
+            const { id } = req.params;
+
+            const result = await petCollection.findOne({
+                _id: new ObjectId(id)
+            });
+            res.json(result);
+        });
+
 
         app.get('/pets', async (req, res) => {
             const result = await petCollection.find().toArray();
