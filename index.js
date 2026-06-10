@@ -31,6 +31,18 @@ async function run() {
 
         //GEt/Post/View details Api
 
+        app.get("/pets/user/:email", async (req, res) => {
+            const email = req.params.email;
+
+            const result = await petCollection.find({
+                ownerEmail: email,
+            }).toArray();
+
+            res.send(result);
+        });
+
+
+
         app.get('/pets/:id', async (req, res) => {
             const { id } = req.params;
 
@@ -40,7 +52,6 @@ async function run() {
             res.json(result);
         });
 
-
         app.get('/pets', async (req, res) => {
             const result = await petCollection.find().toArray();
             res.json(result)
@@ -48,7 +59,6 @@ async function run() {
 
         app.post('/pets', async (req, res) => {
             const petData = req.body
-            console.log(petData)
             const result = await petCollection.insertOne(petData)
             res.json(result)
         })
