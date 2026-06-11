@@ -31,6 +31,27 @@ async function run() {
 
         //GEt/Post/View details Api
 
+        //petch/Edit
+        app.patch('/pets/:id', async (req, res) => {
+            const { id } = req.params;
+            const updateData = req.body;
+
+            const cleanData = Object.fromEntries(
+                Object.entries(updateData).filter(
+                    ([_, value]) => value !== "" && value !== undefined && value !== null
+                )
+            );
+
+            const result = await petCollection.updateOne(
+                { _id: new ObjectId(id) },
+                { $set: cleanData }
+            );
+            res.json(result);
+        });
+        //petch
+
+
+        //my Listins start
         app.get("/pets/user/:email", async (req, res) => {
             const email = req.params.email;
 
@@ -40,9 +61,9 @@ async function run() {
 
             res.send(result);
         });
+        //my Listins Closed
 
-
-
+        //details
         app.get('/pets/:id', async (req, res) => {
             const { id } = req.params;
 
@@ -51,6 +72,7 @@ async function run() {
             });
             res.json(result);
         });
+        //details
 
         app.get('/pets', async (req, res) => {
             const result = await petCollection.find().toArray();
