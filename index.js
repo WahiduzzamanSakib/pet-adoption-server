@@ -29,7 +29,19 @@ async function run() {
         const db = client.db("pet-adoption")
         const petCollection = db.collection("all-pets")
 
-        //GEt/Post/View details Api
+        //GEt/Post/ Api
+
+  //Delate start
+        app.delete('/pets/:id', async (req, res) => {
+            const { id } = req.params;
+
+            const result = await petCollection.deleteOne(
+                { _id: new ObjectId(id) },
+            );
+            res.json(result);
+        });
+        //end
+
 
         //petch/Edit
         app.patch('/pets/:id', async (req, res) => {
