@@ -31,7 +31,7 @@ async function run() {
 
         //GEt/Post/ Api
 
-  //Delate start
+        //Delate start
         app.delete('/pets/:id', async (req, res) => {
             const { id } = req.params;
 
@@ -86,10 +86,45 @@ async function run() {
         });
         //details
 
+        //Get pets and Search Api Start
         app.get('/pets', async (req, res) => {
-            const result = await petCollection.find().toArray();
-            res.json(result)
-        })
+            try {
+                const { search, species, sort } = req.query;
+
+                let query = {};
+
+                if (search) {
+                    query.petName = {
+                        $regex: search,
+                        $options: "i"
+                    };
+                }
+
+                if (species) {
+                    query.Species = {
+                        $in: species.split(",")
+                    };
+                }
+
+                let sortOption = {};
+                if (sort) {
+                    const field = sort.replace("-", "");
+                    sortOption[field] = sort.startsWith("-") ? -1 : 1;
+                }
+
+                const result = await petCollection
+                    .find(query)
+                    .sort(sortOption)
+                    .toArray();
+
+                res.json(result);
+
+            } catch (error) {
+                res.status(500).json({ message: "Server error" });
+            }
+        });
+        //Get pets and Search Api Closed
+
 
         app.post('/pets', async (req, res) => {
             const petData = req.body
