@@ -29,6 +29,38 @@ async function run() {
         const db = client.db("pet-adoption")
         const petCollection = db.collection("all-pets")
 
+
+        //request 
+        const requestCollection = db.collection("adoption-requests");
+
+        app.get("/adoption-requests/requester/:email", async (req, res) => {
+            const email = req.params.email;
+
+            const result = await requestCollection
+                .find({
+                     requesterEmail: email 
+                    })
+                .toArray();
+
+            res.json(result);
+        });
+
+        app.post("/adoption-requests", async (req, res) => {
+            const { requesterEmail, ...rest } = req.body;
+
+            const data = {
+                ...rest,
+                requesterEmail,
+                status: "pending",
+                createdAt: new Date(),
+            };
+
+            const result = await requestCollection.insertOne(data);
+            res.json(result);
+        });
+
+
+
         //GEt/Post/ Api
 
         //Delate start
