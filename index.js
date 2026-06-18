@@ -33,13 +33,43 @@ async function run() {
         //request 
         const requestCollection = db.collection("adoption-requests");
 
+
+        app.patch("/adoption-requests/approve/:petId/:requestId", async (req, res) => {
+            const { petId, requestId } = req.params;
+
+            await requestCollection.updateMany(
+                { petId },
+                { $set: { status: "rejected" } }
+            );
+
+            const result = await requestCollection.updateOne(
+                { _id: new ObjectId(requestId) },
+                { $set: { status: "approved" } }
+            );
+
+            res.json(result);
+        });
+
+
         app.get("/adoption-requests/requester/:email", async (req, res) => {
             const email = req.params.email;
 
             const result = await requestCollection
                 .find({
-                     requesterEmail: email 
-                    })
+                   requesterEmail: email
+                })
+                .toArray();
+
+            res.json(result);
+        });
+
+        app.get("/adoption-requests/owner/:email", async (req, res) => {
+            const email = req.params.email;
+
+            const result = await requestCollection
+                .find({
+                    ownerEmail: email
+                })
                 .toArray();
 
             res.json(result);
@@ -108,7 +138,11 @@ async function run() {
         //my Listins Closed
 
         //details
-        app.get('/pets/:id', async (req, res) => {
+        app.get('/pets/:id', (req, res, next) => {
+            const header = req.headers.authorization
+            console.log(header)
+            next()
+        }, async (req, res) => {
             const { id } = req.params;
 
             const result = await petCollection.findOne({
